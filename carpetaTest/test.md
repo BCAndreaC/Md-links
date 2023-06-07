@@ -2,4 +2,4 @@
 - [OpenAI](https://www.openai.com)
 - [GitHub](https://www.github.com)
 - [Ghibli-Lovers](https://github.com/BCAndreaC/Ghibli-Lovers)
-- [Ghibli-Lovers-404](https://github.com/BCAndreaC/Ghibli-Loverss)
+- [Ghibli-Lovers-404](htps://github.com/BCC/Ghibli-Loverss)
