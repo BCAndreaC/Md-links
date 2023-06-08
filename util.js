@@ -1,26 +1,54 @@
-//Leer el path del usuario
-
-const path = require("path");
 const fs = require("fs");
-const axios = require("axios");
-
-
-//Leer el directorio
-const readDir = (pathUser) => {
-  return new Promise((resolve, reject) => {
-    fs.readdir(pathUser, (error, data) => {
-      if (error) {
-        reject(error);
-        return;
-      } 
-        resolve(data);
-        
-    });
-  } );
+const fetch = require("node-fetch");
+const colors = {
+  fgCyan: '\x1b[36m',
+  fgGreen: '\x1b[32m',
+  fgRed: '\x1b[31m',
+  reset: '\x1b[0m',
 };
 
 
-//leer archivos con extensión .md
+//Leer el directorio
+const readDir = (path) => {
+  // Siempre que se trabaje con archivos se debe utilizar un try/catch
+  try {
+    // Leer el directorio y guardar el resultado en una variable
+    const files = fs.readdirSync(path);
+    // Retornar el resultado
+    return files;
+  } catch (error) {
+    // Lanzar el error para que sea capturado por el catch
+    throw error;
+  }
+};
+
+//Validar si es un directorio o archivo 
+// validatePath is a function that receives a path and a type (file or directory) and returns a promise
+const validatePath = (path, expectedType) => {
+  return new Promise((resolve, reject) => {
+    // stat is an asynchronous function that returns information about the path
+    fs.stat(path, (error, stats) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      // The stats object contains information about the path
+      const isDirectory = stats.isDirectory();
+      const isFile = stats.isFile();
+      if (expectedType === 'directory' && isDirectory) {
+        resolve(path);
+      } else if (expectedType === 'file' && isFile) {
+        resolve(path);
+      } else {
+        // If the path is not valid, reject the promise
+        const errorType = expectedType === 'directory' ? 'directorio' : 'archivo';
+        reject(`La ruta no es un ${errorType} válido`);
+      }
+    });
+  });
+};
+
+//leer archivos 
 const readFile = (pathUser) => {
   return new Promise((resolve, reject) => {
     fs.readFile(pathUser, "utf8", (error, data) => {
@@ -28,31 +56,18 @@ const readFile = (pathUser) => {
         reject(error);
         return;
       } 
-      const extFile = path.extname(pathUser);
-      if(extFile === ".md"){
-        resolve(data);
-      } else {
-        reject("No es un archivo .md");
-      }
+      resolve(data);
     });
   });
 };
 
-//Validar si es un directorio
-const validDir = (pathUser) => {
-  return new Promise((resolve, reject) => {
-    fs.stat(pathUser, (error, stats) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      if (stats.isDirectory()) {
-        resolve(pathUser);
-      } else {
-        reject("No es un directorio");
-      }
+
+//Buscar archivos con extensión .md
+const findMarkdownFiles = (path) => {
+  return Promise.resolve(readDir(path))
+    .then((files) => {
+      return files.filter((file) => file.endsWith('.md'));
     });
-  });
 };
 
 //Validar si es una URL
@@ -72,38 +87,60 @@ const validateUrl = (url) => {
   });
 };
 
-//Leer cada URL dentro de los archivos .md
-const readUrl = (filePath) => {
-  return new Promise((resolve, reject) => {
-    // Aquí deberías implementar la lógica para leer la URL del archivo
-    // y luego llamar a la función validateURL para validarla
-
-    // Por ejemplo, supongamos que la URL está en la primera línea del archivo
-    fs.readFile(filePath, 'utf8', (error, data) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      validateUrl(url)
-        .then((isValid) => {
-          if (isValid) {
-            console.log('La URL', url, 'es válida');
-          } else {
-            console.log('La URL', url, 'está rota o no es accesible');
-          }
-          resolve();
-        })
-        .catch((error) => {
-          console.error('Error al validar la URL', url, ':', error);
-          resolve();
+//Lectura de un archivo y busqueda de URLs dentro de él
+const processMarkdownFile = (filePath) => {
+  return readFile(filePath)
+    .then((data) => {
+  let urls = [];
+      //Regex para encontrar su texto y su URL 
+      const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+      const matches = data.match(regex);
+//Si encuentra coincidencias, las guarda en un array
+      if (matches) {
+        urls = matches.map((match) => {
+          //Regex para encontrar la primera coincidencia de texto y URL
+          const parts = match.match(/\[([^\]]+)\]\(([^)]+)\)/);
+         
+         urls.push(parts[1], parts[2]);
+          return {
+            text: parts[1],
+            url: parts[2],
+          };
         });
+
+        return urls;
+      } else {
+        console.log(colors.fgRed,'No se encontraron URLs en el archivo', filePath, colors.reset);
+      }
+    })
+    .catch((error) => {
+      console.error(colors.fgRed, 'Error al leer el archivo', filePath, ':', error, colors.reset);
     });
-  });
 };
 
+//Validar si la URL es correcta o no el status
+const validateURLs = (urls, filePath) => {
+  const urlPromises = urls.flatMap((urlInfo) => {
+    return validateUrl(urlInfo.url)
+      .then(({ status }) => {
+        console.log('------------------------------');
+        console.log('Href:', colors.fgCyan, urlInfo.url, colors.reset);
+        console.log('Text:', urlInfo.text);
+        console.log('File:', filePath);
+        console.log('Status:', colors.fgGreen, 'Ok', colors.reset);
+        console.log('Status Code:', status);
+      })
+      .catch((error) => {
+        console.error('------------------------------');
+        console.error('Href:', colors.fgCyan, urlInfo.url, colors.reset);
+        console.error('Text:', urlInfo.text);
+        console.error('File:', filePath);
+        console.error('Status:', colors.fgRed, 'Fail', colors.reset);
+        console.error('Status Code:', error.status);
+      });
+  });
 
+  return Promise.all(urlPromises);
+};
 
-
-
-    module.exports = { validDir, readDir, readFile, readUrl,validateUrl };
+    module.exports = { validatePath, findMarkdownFiles, processMarkdownFile, validateURLs };
