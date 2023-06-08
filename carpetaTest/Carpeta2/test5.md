@@ -1,0 +1,2 @@
+- [OpenAI](https://www.ooopernai.com)
+- [Google](https://www.googlee.com)
