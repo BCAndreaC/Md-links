@@ -1,2 +1,3 @@
 - [OpenAI](https://www.ooopernai.com)
-- [Google](https://www.googlee.com)
+- [Google](https://www.googlee.co)
+- [Facebook](https://www.facebook.com)
