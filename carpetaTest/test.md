@@ -1,4 +1,4 @@
-- [Google](https://www.google.com)
+- [Google](https://www.google.com/)
 - [OpenAI](https://www.openai.com)
 - [GitHub](https://www.github.com)
 - [Ghibli-Lovers](https://github.com/BCAndreaC/Ghibli-Lovers)

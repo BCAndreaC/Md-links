@@ -13,5 +13,11 @@
     "axios": "^1.4.0",
     "markdown-it": "^13.0.1",
     "node-fetch": "^2.6.11"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  },
+  "scripts": {
+    "test": "jest --coverage"
   }
 }
