@@ -1,4 +1,4 @@
-const {    pathExists, 
+const {  
   convertToAbsolutePath,
   readDir,
   readFileMd,
@@ -37,13 +37,13 @@ const mdLinks = (pathUser, options) => {
   });
 };
 
-mdLinks(pathUser, { validate: true })
-  .then((links) => {
-    // console.log(links);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+// mdLinks(pathUser, { validate: true })
+//   .then((links) => {
+//     console.log(links);
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
 
 
