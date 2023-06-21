@@ -1,5 +1,5 @@
 {
-  "name": "md-links",
+  "name": "md-links-andysapples",
   "version": "0.1.0",
   "bin": {
     "mdlinks": "./src/cli.js"
