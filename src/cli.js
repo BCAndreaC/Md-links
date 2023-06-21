@@ -1,4 +1,4 @@
-
+#!/usr/bin/env node
 const {mdLinks} = require('./index.js');
 const pathUser = process.argv[2];
 
