@@ -1,3 +1,8 @@
 - [OpenAI](https://www.ooopernai.com)
 - [Google](https://www.googlee.co)
 - [Facebook](https://www.facebook.com)
+- [Google](https://www.google.com/)
+- [OpenAI](https://www.openai.com)
+- [GitHub](https://www.github.com)
+- [Ghibli-Lovers](https://github.com/BCAndreaC/Ghibli-Lovers)
+- [Ghibli-Lovers-404](htps://github.com/BCC/Ghibli-Loverss)

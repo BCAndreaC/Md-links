@@ -24,10 +24,15 @@ const convertToAbsolutePath = (pathUser) => {
 //Leer el directorio y retornar array de archivos .md
 const readDir = (pathUser) => {
   const mdFiles = [];
+  const stats = fs.statSync(pathUser);
+  if(stats.isFile() && path.extname(file) === ".md"){
+    return [pathUser];
+  }
+
   const files = fs.readdirSync(pathUser);
   files.forEach((file) => {
     const absoluteFilePath = path.join(pathUser, file);
-    const stats = fs.statSync(absoluteFilePath);
+   const stats = fs.statSync(absoluteFilePath);
     if (stats.isDirectory()) {
       mdFiles.push(...readDir(absoluteFilePath));
     } else {
@@ -62,7 +67,6 @@ const readFileMd = (pathUser) => {
         
         resolve(links);
       });
-      
     });
   };
   // readFileMd(pathUser)
@@ -119,13 +123,14 @@ const uniqueLinks = (links) => {
   const uniqueLinks = [];
   links.forEach((link) => {
     const linkExists = uniqueLinks.find((uniqueLink) => {
-      return uniqueLink.url === link.url;
+      return uniqueLink.href === link.href;
     });
     if (!linkExists) {
       uniqueLinks.push(link);
     }
   });
   return uniqueLinks;
+  
 };
 
 //Links de archivos .md que esten rotos
@@ -136,6 +141,7 @@ const brokenLinks = (links) => {
       brokenLinks.push(link);
     }
   });
+  // console.log(brokenLinks);
   return brokenLinks;
 };
 
