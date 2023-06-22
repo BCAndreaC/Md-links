@@ -1,6 +1,6 @@
 const {mdLinks} = require('../src/index.js');
 const fetch = require('node-fetch');
-const { validateURLs, readFileMd, validateUrl, readDir,pathExists, convertToAbsolutePath } = require('../src/util.js');
+const { validateURLs, readFileMd, validateUrl, readDir,pathExists, convertToAbsolutePath,uniqueLinks,brokenLinks } = require('../src/util.js');
 
 
 jest.mock('node-fetch');
@@ -43,8 +43,21 @@ it ('Debe de devolver una promesa de todos los links de los archivos .md', () =>
         expect(error).toBe(error);
       });
   });
- 
+  it ('Debe validar si es un archivo con extension .md', () => {
+    return mdLinks('E:/Git/Md-links/carpetaTest/test.md')
+      .then((result) => {
+        expect(result).toEqual(result);
+      });
+  });
+  it('Debe de rechazar la promesa si no es un archivo con extension .md', () => {
+    return mdLinks('E:/Git/Md-links/carpetaTest/test.txt')
+      .catch((error) => {
+        expect(error).toBe(error);
+      });
+  });
 });
+
+
 
 describe('validateURLs', () => {
 
@@ -150,3 +163,68 @@ describe('convertToAbsolutePath', () => {
     expect(path).toBe('E:\\Git\\Md-links\\carpetaTest\\test2.md');
   }); 
 });
+
+describe ('uniqueLinks', () => {
+  it('Debe de retornar un array de links unicos', () => {
+    const links = [
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.google.com/",
+        text: "Google",
+      },
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.openai.com",
+        text: "OpenAI",
+      },
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.github.com",
+        text: "GitHub",
+      },
+    ];
+    const unique = uniqueLinks(links);
+    expect(unique).toEqual(links);
+  });
+});
+
+describe ('brokenLinks', () => {
+  it('Debe de retornar un array de links rotos', () => {
+    const links = [
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.google.com/",
+        text: "Google",
+        status: 200,
+        statusText: 'OK',
+      },
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.openai.com",
+        text: "OpenAI",
+        status: 404,
+        statusText: 'Fail',
+      },
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.github.com",
+        text: "GitHub",
+        status: 200,
+        statusText: 'OK',
+      },
+    ];
+    const linksBroken = [
+      {
+        file: "E:/Git/Md-links/carpetaTest/test.md",
+        href: "https://www.openai.com",
+        text: "OpenAI",
+        status: 404,
+        statusText: 'Fail',
+      },
+    ];
+
+    const broken = brokenLinks(links);
+    expect(broken).toEqual(linksBroken);
+  });
+});
+
